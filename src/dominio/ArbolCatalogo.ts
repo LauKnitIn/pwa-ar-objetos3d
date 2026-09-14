@@ -32,10 +32,23 @@ class Arbol{
 
     agregarPatron(valor : PatronArquitectura) : void{
         const nuevoNodo = new Nodo(valor);
+        this.insertarNodo(this.nodoRaiz, nuevoNodo);
     }
 
-    insertarNodo(actual: Nodo, nuevoNodo : Node): void{
-        
+    insertarNodo(actual: Nodo, nuevoNodo : Nodo): void{
+        if (nuevoNodo.valor.nombre.localeCompare(actual.valor.nombre) < 0) {
+            if (actual.nodoIzq === null) {
+                actual.setHijoIzq(nuevoNodo);
+            } else {
+                this.insertarNodo(actual.nodoIzq, nuevoNodo);
+            }
+        } else {
+            if (actual.nodoDer === null) {
+                actual.setHijoDer(nuevoNodo);
+            } else {
+                this.insertarNodo(actual.nodoDer, nuevoNodo);
+            }
+        }
     }
 
 }
