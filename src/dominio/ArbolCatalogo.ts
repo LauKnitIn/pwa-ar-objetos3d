@@ -1,6 +1,6 @@
 import type { PatronArquitectura } from "./PatronArquitectura";
 
-class Nodo{
+export class Nodo{
 
     valor: PatronArquitectura
     nodoIzq : Nodo | null
@@ -22,7 +22,7 @@ class Nodo{
 
 }
 
-class Arbol{
+export class Arbol{
 
     nodoRaiz: Nodo
 
