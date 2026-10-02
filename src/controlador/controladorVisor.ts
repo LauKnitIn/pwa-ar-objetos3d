@@ -1,7 +1,7 @@
 export class ControladorVisor{
-    listaElegida : HTMLUListElement;
-    lienzoElegido: HTMLLIElement;
-    descripcion : HTMLInputElement;
+    listaElegida : HTMLUListElement 
+    lienzoElegido: HTMLLIElement
+    descripcion : HTMLInputElement
 
     constructor(listaElegida : HTMLUListElement,lienzoElegido: HTMLLIElement,    descripcion : HTMLInputElement){
         this.listaElegida = listaElegida;
