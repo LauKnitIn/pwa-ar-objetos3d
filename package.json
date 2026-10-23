@@ -10,11 +10,9 @@
   },
   "devDependencies": {
     "@types/three": "^0.186.0",
+    "three": "^0.186.1",
     "typescript": "~6.0.2",
     "vite": "^8.3.0",
     "vite-plugin-pwa": "^2.0.0"
-  },
-  "dependencies": {
-    "three": "^0.186.0"
   }
 }
