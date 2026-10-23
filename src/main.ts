@@ -1,17 +1,11 @@
-import './style.css'
-import { ControladorVisor } from './controlador/controladorVisor';
+import { registerSW } from 'virtual:pwa-register';
 
-
-const listaEl = document.querySelector("#lista-catalogo");
-const lienzoEl = document.querySelector("#lienzo-3d");
-const descripcion = document.querySelector("#descripcion");
-
-//const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
-//controladorVisor.iniciar();
-
-if('serviceWorker' in navigator){
-    navigator.serviceWorker
-    .register('/sw.js')
-    .then(reg => console.log('Registro de SW exitoso', reg))
-    .catch(err => console.warn('Error al tratar de registrar el SW', err));
-}
+registerSW({
+  immediate: true,
+  onRegisteredSW(swUrl, registration) {
+    console.log('SW de Workbox registrado:', swUrl, registration);
+  },
+  onRegisterError(error) {
+    console.error('Error al registrar el SW de Workbox:', error);
+  },
+});

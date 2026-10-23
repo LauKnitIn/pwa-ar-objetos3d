@@ -10,6 +10,8 @@ import {
   guardarNotaDeEstudio 
 } from './db.js';
 
+import { registerSW } from 'virtual:pwa-register';
+
 
 const listaEl = document.querySelector("#lista-catalogo");
 const lienzoEl = document.querySelector("#lienzo-3d");
@@ -18,12 +20,15 @@ const descripcion = document.querySelector("#descripcion");
 //const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
 //controladorVisor.iniciar();
 
-if('serviceWorker' in navigator){
-    navigator.serviceWorker
-    .register('/sw.js')
-    .then(reg => console.log('Registro de SW exitoso', reg))
-    .catch(err => console.warn('Error al tratar de registrar el SW', err));
-}
+const updateSW = registerSW({
+  immediate: true,
+  onRegisteredSW(swUrl, registration) {
+    console.log('SW de Workbox registrado exitosamente:', swUrl, registration);
+  },
+  onRegisterError(error) {
+    console.error('Error al registrar el SW de Workbox:', error);
+  },
+});
 
 
 async function iniciarProgreso() {
