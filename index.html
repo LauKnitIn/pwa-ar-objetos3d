@@ -1,14 +1,22 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="manifest" href="/manifest.json">
     <title>pwa-ar-objetos3d</title>
   </head>
   <body>
-    <ul #lista-catalogo>
-    </ul>
-    
-    <script type="module" src="/src/main.ts"></script>
+    <h1>Atlas 3D - Progreso</h1>
+
+    <!-- Lista para mostrar los favoritos guardados -->
+    <ul id="lista-catalogo"></ul>
+
+    <!-- Elementos adicionales referenciados en app.js -->
+    <div id="descripcion"></div>
+    <canvas id="lienzo-3d"></canvas>
+
+    <!-- Apuntando al script en la raíz si app.js está en la raíz -->
+    <script type="module" src="/app.js"></script>
   </body>
 </html>

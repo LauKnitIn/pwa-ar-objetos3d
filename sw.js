@@ -2,7 +2,7 @@ const CACHE_NAME = 'atlas3d-v2';
 const CORE_ASSETS = [
   '/index.html',
   '/src/styles.css',
-  '/src/main.ts',
+  '/app.js',
   '/manifest.json',
   '/sw.js'
 ];
