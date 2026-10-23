@@ -301,3 +301,24 @@ code {
   background-color: #0b1220;
   display: block;
 }
+
+.visor {
+  position: relative;
+  background: #0b1220;
+  overflow: hidden;
+}
+.fondo-camara {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.fondo-camara[hidden] {
+  display: none !important;
+}
+.visor canvas {
+  position: relative;
+  z-index: 1;
+}

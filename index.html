@@ -14,9 +14,21 @@
 
     <!-- Elementos adicionales referenciados en app.js -->
     <div id="descripcion"></div>
-    <div id="lienzo-3d" style="width: 100%; height: 400px;"></div>
-    <button id="btn-orientacion">📱 Rotar con el teléfono</button>
-    <button id="btn-calibrar" disabled>Calibrar</button>
+   <!-- Contenedor del Visor con el video de fondo oculto -->
+    <div id="visor" class="visor" style="position: relative; width: 100%; height: 400px; background: #0b1220;">
+      <video id="fondo-camara" class="fondo-camara" playsinline muted hidden></video>
+      <div id="lienzo-3d" style="width: 100%; height: 100%;"></div>
+    </div>
+
+    <!-- NUEVOS BOTONES DE SENSORES Y CÁMARA -->
+    <div style="margin-top: 10px;">
+      <button id="btn-orientacion">📱 Rotar con el teléfono</button>
+      <button id="btn-calibrar" disabled>Calibrar</button>
+      <button id="btn-camara">📷 Cámara de fondo</button>
+    </div>
+    
+    <!-- Contenedor para los mensajes de estado -->
+    <div id="mensaje-visor" style="margin-top: 8px; color: #38bdf8; font-size: 0.9rem;"></div>
 
     <!-- Apuntando al script en la raíz si app.js está en la raíz -->
     <script type="module" src="/app.js"></script>

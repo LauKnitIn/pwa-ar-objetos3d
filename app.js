@@ -11,7 +11,7 @@ import {
   derivarClave,
   guardarNotaDeEstudio 
 } from './db.js';
-
+import { iniciarCamaraDeFondo, detenerCamaraDeFondo } from '/src/camara.ts';
 import { registerSW } from 'virtual:pwa-register';
 
 
@@ -20,8 +20,13 @@ const lienzoEl = document.querySelector("#lienzo-3d");
 const btnOrientacion = document.querySelector("#btn-orientacion");
 const btnCalibrar = document.querySelector("#btn-calibrar");
 
+const videoEl = document.querySelector("#fondo-camara");
+const btnCamara = document.querySelector("#btn-camara");
+const mensajeVisor = document.querySelector("#mensaje-visor");
+
 let visor = null;
 let control = null;
+let streamFondo = null;
 
 //const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
 //controladorVisor.iniciar();
@@ -79,6 +84,50 @@ if (btnCalibrar) {
   });
 }
 
+
+function avisarVisor(texto) {
+  if (mensajeVisor) mensajeVisor.textContent = texto;
+}
+
+async function apagarCamara() {
+  if (streamFondo && videoEl) {
+    detenerCamaraDeFondo(videoEl, streamFondo);
+    streamFondo = null;
+    if (visor) visor.fondoTransparente(false);
+    if (btnCamara) btnCamara.textContent = "📷 Cámara de fondo";
+    avisarVisor("Cámara apagada.");
+  }
+}
+
+if (btnCamara && videoEl) {
+  btnCamara.addEventListener("click", async () => {
+    if (streamFondo) {
+      await apagarCamara();
+      return;
+    }
+
+    try {
+      streamFondo = await iniciarCamaraDeFondo(videoEl);
+      if (visor) visor.fondoTransparente(true);
+      btnCamara.textContent = "📷 Cámara: ACTIVA (toca para apagar)";
+      avisarVisor("");
+    } catch (error) {
+      console.error("Error al acceder a la cámara:", error);
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        avisarVisor("Bloqueaste el permiso de cámara. El visor sigue funcionando sin ella.");
+      } else {
+        avisarVisor("No se pudo acceder a la cámara en este dispositivo o entorno.");
+      }
+    }
+  });
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && streamFondo) {
+    apagarCamara();
+    avisarVisor("La cámara se apagó al salir de la página. Vuelve a activarla cuando quieras.");
+  }
+});
 
 async function iniciarProgreso() {
   try {
