@@ -1,0 +1,8 @@
+{
+  "id": "modelo-demo-1",
+  "nombre": "Patrón MVC",
+  "resumen": "Modelo-Vista-Controlador separa la lógica de negocio, la interfaz de usuario y el manejo de entradas.",
+  "componentes": ["Modelo", "Vista", "Controlador"],
+  "cuandoUsarla": "Aplicaciones monolíticas de escritorio o web tradicionales.",
+  "riesgo": "Acoplamiento excesivo entre la vista y el controlador si no se gestionan bien las responsabilidades."
+}

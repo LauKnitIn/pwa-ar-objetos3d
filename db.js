@@ -1,5 +1,5 @@
 const DB_NAME = 'atlas3d-progreso-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 
 export function abrirBaseDeDatos() {
@@ -8,10 +8,15 @@ export function abrirBaseDeDatos() {
 
     peticion.onupgradeneeded = event => {
       const db = event.target.result;
-      if (!db.objectStoreNames.contains('progreso')) {
-        const store = db.createObjectStore('progreso', { keyPath: 'modeloId' });
-        store.createIndex('porFavorito', 'favorito', { unique: false });
-        store.createIndex('porUltimaVisita', 'ultimaVisita', { unique: false });
+      if (event.oldVersion < 1) {
+        if (!db.objectStoreNames.contains('progreso')) {
+          const store = db.createObjectStore('progreso', { keyPath: 'modeloId' });
+          store.createIndex('porFavorito', 'favorito', { unique: false });
+          store.createIndex('porUltimaVisita', 'ultimaVisita', { unique: false });
+        }
+      }
+      if (event.oldVersion < 2) {
+        db.createObjectStore("descargas", { keyPath: "modeloId" });
       }
     };
 
@@ -151,5 +156,34 @@ export async function guardarNotaDeEstudio(db, clave, modeloId, texto) {
     const escritura = store.put(registro);
     escritura.onsuccess = () => resolve();
     escritura.onerror = () => reject(escritura.error);
+  });
+}
+
+export function encolarDescargas(db, ids){
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("descargas", "readwrite");
+    const store = tx.objectStore("descargas");
+    ids.forEach((modeloId) => {
+      store.put({ modeloId, estado: "pendiente" });
+    });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+export function obtenerDescargas(db) {
+  return new Promise((resolve, reject) => {
+    const peticion = db.transaction("descargas", "readonly").objectStore("descargas").getAll();
+    peticion.onsuccess = () => resolve(peticion.result);
+    peticion.onerror = () => reject(peticion.error);
+  });
+}
+
+export function marcarDescargaLista(db, modeloId) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction("descargas", "readwrite");
+    tx.objectStore("descargas").put({ modeloId, estado: "listo" });
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
   });
 }

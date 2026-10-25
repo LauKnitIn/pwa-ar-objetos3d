@@ -1,0 +1,8 @@
+{
+  "id": "modelo-demo-3",
+  "nombre": "Microservicios",
+  "resumen": "Estructura una aplicación como un conjunto de servicios autónomos e independientes.",
+  "componentes": ["Servicios", "API Gateway", "Base de datos por servicio"],
+  "cuandoUsarla": "Sistemas altamente escalables con equipos distribuidos.",
+  "riesgo": "Complejidad operativa y latencia de red."
+}

@@ -1,0 +1,8 @@
+{
+  "id": "modelo-demo-2",
+  "nombre": "Arquitectura en Capas",
+  "resumen": "Organiza el sistema en niveles horizontales con responsabilidades específicas.",
+  "componentes": ["Presentación", "Negocio", "Datos"],
+  "cuandoUsarla": "Sistemas empresariales estándar con alta necesidad de mantenibilidad.",
+  "riesgo": "Efecto pasarela si una capa solo delega sin aportar valor."
+}

@@ -9,10 +9,12 @@ import {
   alternarFavorito, 
   obtenerFavoritos,
   derivarClave,
-  guardarNotaDeEstudio 
+  guardarNotaDeEstudio,
+  encolarDescargas
 } from './db.js';
 import { iniciarCamaraDeFondo, detenerCamaraDeFondo } from '/src/camara.ts';
 import { registerSW } from 'virtual:pwa-register';
+import { descargarPendientes, ETIQUETA_SYNC } from '/src/descargas.js'; 
 
 
 const listaEl = document.querySelector("#lista-catalogo");
@@ -24,9 +26,15 @@ const videoEl = document.querySelector("#fondo-camara");
 const btnCamara = document.querySelector("#btn-camara");
 const mensajeVisor = document.querySelector("#mensaje-visor");
 
+const btnAvisos = document.querySelector("#btn-avisos");
+const btnDescargar = document.querySelector("#btn-descargar");
+const estadoDescargaEl = document.querySelector("#estado-descarga");
+
+
 let visor = null;
 let control = null;
 let streamFondo = null;
+const MODELOS_IDS = ["modelo-demo-1", "modelo-demo-2", "modelo-demo-3"];
 
 //const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
 //controladorVisor.iniciar();
@@ -42,11 +50,9 @@ const updateSW = registerSW({
 });
 
 if (lienzoEl) {
-  // Inicializamos el visor 3D con el cubo de prueba
   visor = crearVisor(lienzoEl);
 }
 
-// Lógica del botón de sensores
 if (btnOrientacion) {
   btnOrientacion.addEventListener("click", async () => {
     if (control) {
@@ -128,6 +134,62 @@ document.addEventListener("visibilitychange", () => {
     avisarVisor("La cámara se apagó al salir de la página. Vuelve a activarla cuando quieras.");
   }
 });
+
+if (btnAvisos) {
+  btnAvisos.addEventListener("click", async () => {
+    const permiso = await Notification.requestPermission();
+    if (permiso === "granted") {
+      alert("Avisos activados con éxito.");
+    } else {
+      alert("Permiso de avisos denegado.");
+    }
+  });
+}
+
+if (btnDescargar) {
+  btnDescargar.addEventListener("click", async () => {
+    const db = await abrirBaseDeDatos();
+    await encolarDescargas(db, MODELOS_IDS);
+    estadoDescargaEl.textContent = "Iniciando descarga...";
+    btnDescargar.disabled = true;
+
+    try {
+      let enSegundoPlano = false;
+      if ("serviceWorker" in navigator && "SyncManager" in window) {
+        try {
+          const reg = await navigator.serviceWorker.ready;
+          await reg.sync.register(ETIQUETA_SYNC);
+          enSegundoPlano = true;
+          estadoDescargaEl.textContent = "Descarga solicitada: el navegador la completará en segundo plano.";
+        } catch {
+          enSegundoPlano = false;
+        }
+      }
+
+      if (!enSegundoPlano) {
+        await descargarPendientes(db, (hechos, total) => {
+          estadoDescargaEl.textContent = `Descargando fichas: ${hechos} de ${total}`;
+        });
+        estadoDescargaEl.textContent = "✓ 3 de 3 fichas guardadas: ya puedes consultarlas sin conexión.";
+      }
+    } catch (err) {
+      estadoDescargaEl.textContent = "No se pudo completar la descarga: " + err.message;
+    } finally {
+      btnDescargar.disabled = false;
+    }
+  });
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    const datos = event.data;
+    if (datos.tipo === "progreso") {
+      estadoDescargaEl.textContent = `Descargando en 2do plano: ${datos.hechos} de ${datos.total}`;
+    } else if (datos.tipo === "descarga-completa") {
+      estadoDescargaEl.textContent = "✓ Fichas descargadas y listas para usar sin conexión.";
+    }
+  });
+}
 
 async function iniciarProgreso() {
   try {
