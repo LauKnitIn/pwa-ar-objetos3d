@@ -106,8 +106,8 @@ export function crearVisor(contenedor: HTMLElement): Visor {
         grupo.scale.copy(escalaPrevia);
         grupo.rotation.set(0, 0, 0);
 
-        ajustarTamano(); // Ajustar canvas alterado por el visor XR
-        bucle(); // Reanudar requestAnimationFrame normal
+        ajustarTamano(); 
+        bucle(); 
         alTerminar();
       },
       { once: true }

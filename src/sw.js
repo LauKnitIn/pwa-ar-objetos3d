@@ -11,6 +11,8 @@ clientsClaim();
 cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 
+const BASE  = import.meta.env.BASE_URL;
+
 registerRoute(
   ({ url }) => url.pathname.startsWith("/modelos/"),
   async ({ request }) => {

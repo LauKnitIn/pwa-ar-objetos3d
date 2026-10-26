@@ -2,7 +2,8 @@ import { obtenerDescargas, marcarDescargaLista } from "../db.js";
 
 export const ETIQUETA_SYNC = "descargar-modelos";
 export const CACHE_MODELOS = "modelos-3d";
-export const urlDeModelo = (id) => `/modelos/${id}.json`;
+//export const urlDeModelo = (id) => `/modelos/${id}.json`;
+export const urlDeModelo = (id) => '${import.meta.env.BASE_URL}modelos/${id}.json';
 
 export async function descargarPendientes(db, alProgresar) {
   const todas = await obtenerDescargas(db);

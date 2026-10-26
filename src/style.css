@@ -324,7 +324,6 @@ code {
 
 .xr-overlay { display: none; }
 
-/* Mientras dura la sesión, el navegador estira este elemento sobre toda la pantalla */
 .xr-overlay:xr-overlay { 
   display: flex; 
   flex-direction: column; 

@@ -216,17 +216,14 @@ btnRecomprobar?.addEventListener("click", () => void comprobarAR());
 navigator.xr?.addEventListener("devicechange", () => void comprobarAR());
 
 btnAR?.addEventListener("click", async () => {
-  // Apagamos componentes en conflicto (cámara de fondo y sensores previos)
   if (typeof apagarCamara === "function") apagarCamara();
   if (typeof apagarSensores === "function") apagarSensores();
 
   try {
-    // La petición OCURRE DENTRO DEL CLIC (gesto del usuario exigido por WebXR)
     const sesion = await pedirSesionAR(overlayAR);
     sesionAR = sesion;
     btnAR.disabled = true;
 
-    // Llamamos a la función del visor que conecta Three.js al bucle XR
     await visor.entrarEnAR(sesion, () => {
       sesionAR = null;
       btnAR.disabled = false;
