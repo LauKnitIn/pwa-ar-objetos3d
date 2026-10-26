@@ -216,8 +216,9 @@ btnRecomprobar?.addEventListener("click", () => void comprobarAR());
 navigator.xr?.addEventListener("devicechange", () => void comprobarAR());
 
 btnAR?.addEventListener("click", async () => {
-  if (typeof apagarCamara === "function") apagarCamara();
-  if (typeof apagarSensores === "function") apagarSensores();
+  avisarVisor("");
+  apagarCamara();
+  apagarSensores();
 
   try {
     const sesion = await pedirSesionAR(overlayAR);
