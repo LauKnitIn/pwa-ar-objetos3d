@@ -16,6 +16,8 @@ import { iniciarCamaraDeFondo, detenerCamaraDeFondo } from '/src/camara.ts';
 import { registerSW } from 'virtual:pwa-register';
 import { descargarPendientes, ETIQUETA_SYNC } from '/src/descargas.js'; 
 
+import { diagnosticarAR, mensajeSoporteAR, pedirSesionAR } from "/src/xr.js";
+
 
 const listaEl = document.querySelector("#lista-catalogo");
 const lienzoEl = document.querySelector("#lienzo-3d");
@@ -30,10 +32,19 @@ const btnAvisos = document.querySelector("#btn-avisos");
 const btnDescargar = document.querySelector("#btn-descargar");
 const estadoDescargaEl = document.querySelector("#estado-descarga");
 
+const btnAR = document.querySelector("#btn-ar");
+const estadoAR = document.querySelector("#estado-ar");
+const diagAR = document.querySelector("#diag-ar");
+const detallesAR = document.querySelector(".diag-ar");
+const btnRecomprobar = document.querySelector("#btn-recomprobar");
+const overlayAR = document.querySelector("#xr-overlay");
+const btnSalirAR = document.querySelector("#btn-salir-ar");
+
 
 let visor = null;
 let control = null;
 let streamFondo = null;
+let sesionAR = null;
 const MODELOS_IDS = ["modelo-demo-1", "modelo-demo-2", "modelo-demo-3"];
 
 //const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
@@ -190,6 +201,52 @@ if ("serviceWorker" in navigator) {
     }
   });
 }
+
+async function comprobarAR() {
+  const { estado, lineas } = await diagnosticarAR();
+  estadoAR.textContent = mensajeSoporteAR(estado);
+  diagAR.textContent = lineas.join("\n");
+  if (!sesionAR) btnAR.disabled = estado !== "disponible";
+  detallesAR.open = estado !== "disponible";
+}
+
+void comprobarAR();
+
+btnRecomprobar?.addEventListener("click", () => void comprobarAR());
+navigator.xr?.addEventListener("devicechange", () => void comprobarAR());
+
+btnAR?.addEventListener("click", async () => {
+  // Apagamos componentes en conflicto (cámara de fondo y sensores previos)
+  if (typeof apagarCamara === "function") apagarCamara();
+  if (typeof apagarSensores === "function") apagarSensores();
+
+  try {
+    // La petición OCURRE DENTRO DEL CLIC (gesto del usuario exigido por WebXR)
+    const sesion = await pedirSesionAR(overlayAR);
+    sesionAR = sesion;
+    btnAR.disabled = true;
+
+    // Llamamos a la función del visor que conecta Three.js al bucle XR
+    await visor.entrarEnAR(sesion, () => {
+      sesionAR = null;
+      btnAR.disabled = false;
+      estadoAR.textContent = "La sesión de realidad aumentada terminó.";
+    });
+
+    estadoAR.textContent = sesion.domOverlayState
+      ? "Sesión de realidad aumentada activa. Usa «Salir de AR» sobre la cámara."
+      : "Sesión de realidad aumentada activa. Sal con el gesto de salida del sistema.";
+  } catch (err) {
+    sesionAR?.end().catch(() => {});
+    sesionAR = null;
+    btnAR.disabled = false;
+    console.error("Error al iniciar AR:", err);
+  }
+});
+
+btnSalirAR?.addEventListener("click", () => {
+  void sesionAR?.end();
+});
 
 async function iniciarProgreso() {
   try {

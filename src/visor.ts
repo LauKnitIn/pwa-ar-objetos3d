@@ -8,6 +8,7 @@ export interface Visor {
   controlPorSensores(activo: boolean): void;
   fondoTransparente(activo: boolean): void;
   rotacionActualGrados(): { x: number; y: number };
+  entrarEnAR(sesion: XRSession, alTerminar: () => void): Promise<void>;   
   destruir(): void;
 }
 
@@ -45,6 +46,7 @@ export function crearVisor(contenedor: HTMLElement): Visor {
   let objetivoX = 0;
   let objetivoY = 0;
   let animacionId: number;
+  let sesionAR: XRSession | null = null;
 
   function bucle() {
     animacionId = requestAnimationFrame(bucle);
@@ -57,13 +59,60 @@ export function crearVisor(contenedor: HTMLElement): Visor {
   }
   bucle();
 
+  function ajustarTamano() {
+    if (!contenedor) return;
+    camara.aspect = contenedor.clientWidth / contenedor.clientHeight;
+    camara.updateProjectionMatrix();
+    renderer.setSize(contenedor.clientWidth, contenedor.clientHeight);
+  }
+
   window.addEventListener('resize', () => {
     if (!contenedor) return;
     camara.aspect = contenedor.clientWidth / contenedor.clientHeight;
     camara.updateProjectionMatrix();
     renderer.setSize(contenedor.clientWidth, contenedor.clientHeight);
   });
+  async function entrarEnARInterno(sesion: XRSession, alTerminar: () => void) {
+    cancelAnimationFrame(animacionId); 
+    renderer.xr.enabled = true;
+    renderer.xr.setReferenceSpaceType("local");
+    await renderer.xr.setSession(sesion);
+    sesionAR = sesion;
 
+    const fondoPrevio = escena.background;
+    escena.background = null; 
+    controles.enabled = false;
+
+    const posicionPrevia = grupo.position.clone();
+    const escalaPrevia = grupo.scale.clone();
+
+    grupo.position.set(0, -0.2, -1.5);
+    grupo.scale.setScalar(0.25);
+
+    renderer.setAnimationLoop(() => {
+      grupo.rotation.y += 0.01; 
+      renderer.render(escena, camara);
+    });
+
+    sesion.addEventListener(
+      "end",
+      () => {
+        renderer.setAnimationLoop(null);
+        renderer.xr.enabled = false;
+        sesionAR = null;
+        escena.background = fondoPrevio;
+        controles.enabled = !porSensores;
+        grupo.position.copy(posicionPrevia);
+        grupo.scale.copy(escalaPrevia);
+        grupo.rotation.set(0, 0, 0);
+
+        ajustarTamano(); // Ajustar canvas alterado por el visor XR
+        bucle(); // Reanudar requestAnimationFrame normal
+        alTerminar();
+      },
+      { once: true }
+    );
+  }
   return {
     rotarHacia(rotX: number, rotY: number) {
       objetivoX = rotX;
@@ -82,10 +131,20 @@ export function crearVisor(contenedor: HTMLElement): Visor {
         y: Math.round(grupo.rotation.y * (180 / Math.PI))
       };
     },
+    async entrarEnAR(sesion: XRSession, alTerminar: () => void) {
+      await entrarEnARInterno(sesion, alTerminar);
+    },
     destruir() {
       cancelAnimationFrame(animacionId);
+      if (sesionAR) {
+        sesionAR.end().catch(() => {}); 
+      }
       renderer.dispose();
       contenedor.innerHTML = '';
     }
+    
+    
   };
+  
 }
+

@@ -36,6 +36,20 @@
     <!-- Contenedor para los mensajes de estado -->
     <div id="mensaje-visor" style="margin-top: 8px; color: #38bdf8; font-size: 0.9rem;"></div>
 
+    <div id="xr-overlay" class="xr-overlay">
+      <p id="xr-estado">Sesión de realidad aumentada activa</p>
+      <button type="button" id="btn-salir-ar">Salir de AR</button>
+    </div>
+
+    <button type="button" id="btn-ar" disabled>Ver en AR</button>
+    <p id="estado-ar">Comprobando soporte para realidad aumentada...</p>
+
+    <details class="diag-ar">
+      <summary>Diagnóstico de realidad aumentada</summary>
+      <pre id="diag-ar"></pre>
+      <button type="button" id="btn-recomprobar">Comprobar de nuevo</button>
+    </details>
+
     <!-- Apuntando al script en la raíz si app.js está en la raíz -->
     <script type="module" src="/app.js"></script>
   </body>
