@@ -218,7 +218,20 @@ navigator.xr?.addEventListener("devicechange", () => void comprobarAR());
 btnAR?.addEventListener("click", async () => {
   avisarVisor("");
   apagarCamara();
-  apagarSensores();
+  
+  if (control) {
+    control.detener();
+    control = null;
+  }
+  if (visor) {
+    visor.controlPorSensores(false);
+  }
+  if (btnOrientacion) {
+    btnOrientacion.textContent = "📱 Rotar con el teléfono";
+  }
+  if (btnCalibrar) {
+    btnCalibrar.disabled = true;
+  }
 
   try {
     const sesion = await pedirSesionAR(overlayAR);
