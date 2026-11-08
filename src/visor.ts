@@ -212,7 +212,8 @@ export function iniciarVisor(contenedorId: string, opcionesAR?: OpcionesAR) {
       raiz.visible = true;
       raiz.matrix.makeTranslation(0, -0.5, -1.5);
     } else {
-      raiz.visible = false;
+      raiz.visible = true;
+      raiz.matrix.makeTranslation(0, 0, -1.5);
     }
 
     let fuente: XRHitTestSource | null = null;
