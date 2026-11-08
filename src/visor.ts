@@ -24,18 +24,6 @@ export interface EstadoAR extends CapacidadesAR {
   sinSuperficie: boolean;
 }
 
-export interface EstadoAR extends CapacidadesAR {
-  fase: FaseAR;
-  anclado: boolean;
-  escala: number;
-  giroGrados: number;
-  posicion: { x: number; y: number; z: number };
-  consultas: number;
-  resultados: number;
-  impactos: number;
-  sinSuperficie: boolean;
-}
-
 export interface OpcionesAR {
   overlay: HTMLElement;
   alCambiar: (estado: EstadoAR) => void;
@@ -59,7 +47,6 @@ export function iniciarVisor(contenedorId: string, opcionesAR?: OpcionesAR) {
   if (!contenedor) return;
 
   const escena = new THREE.Scene();
-  escena.background = new THREE.Color(0x0b1220);
 
   const camara = new THREE.PerspectiveCamera(
     60,

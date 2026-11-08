@@ -298,13 +298,12 @@ code {
 #lienzo-3d {
   width: 100%;
   height: 100%;
-  display: block;
+  /*display: block;*/
 }
 .visor {
   position: relative;
   width: 100%;
-  max-width: 600px;
-  height: 400px; /* Respetamos tu altura inicial fija para que no salte de tamaño */
+  height: 720px;
   margin: 0 auto;
   background: #0b1220;
   overflow: hidden;
@@ -315,7 +314,6 @@ code {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
   z-index: 0;
 }
 .fondo-camara[hidden] {
@@ -324,8 +322,8 @@ code {
 .visor canvas {
   position: absolute;
   inset: 0;
-  width: 100% !important;
-  height: 100% !important;
+  width: 100%;
+  height: 100%;
   z-index: 1;
 }
 .xr-overlay { 

@@ -46,8 +46,8 @@ let streamFondo = null;
 let sesionAR = null;
 const MODELOS_IDS = ["modelo-demo-1", "modelo-demo-2", "modelo-demo-3"];
 
-//const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
-//controladorVisor.iniciar();
+const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
+controladorVisor.iniciar();
 
 // --- FUNCIONES DE ESTADO Y AYUDA AR ---
 const xrEstado = document.querySelector("#xr-estado");
@@ -127,9 +127,9 @@ const updateSW = registerSW({
   },
 });
 
-if (lienzoEl) {
+/*if (lienzoEl) {
   visor = crearVisor(lienzoEl);
-}
+}*/
 
 if (btnOrientacion) {
   btnOrientacion.addEventListener("click", async () => {
@@ -177,6 +177,7 @@ async function apagarCamara() {
   if (streamFondo && videoEl) {
     detenerCamaraDeFondo(videoEl, streamFondo);
     streamFondo = null;
+    videoEl.setAttribute('hidden', '');
     if (visor) visor.fondoTransparente(false);
     if (btnCamara) btnCamara.textContent = "📷 Cámara de fondo";
     avisarVisor("Cámara apagada.");
@@ -192,6 +193,7 @@ if (btnCamara && videoEl) {
 
     try {
       streamFondo = await iniciarCamaraDeFondo(videoEl);
+      videoEl.removeAttribute('hidden');
       if (visor) visor.fondoTransparente(true);
       btnCamara.textContent = "📷 Cámara: ACTIVA (toca para apagar)";
       avisarVisor("");
