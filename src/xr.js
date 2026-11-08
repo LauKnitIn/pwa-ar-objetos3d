@@ -39,13 +39,33 @@ export function mensajeSoporteAR(estado) {
  * @param {HTMLElement | null} overlay 
  * @returns {Promise<XRSession>}
  */
-export function pedirSesionAR(overlay) {
-  const opciones = {
-    requiredFeatures: ["local"], // el origen (0,0,0) es donde está el usuario al empezar
-    optionalFeatures: ["hit-test", "dom-overlay"], // si existe, el botón «Salir» se dibuja sobre la cámara
+export async function pedirSesionAR(overlay) {
+  const abrir = (requeridas, opcionales) => {
+    const opciones = {
+      requiredFeatures: requeridas, // "local": el origen (0,0,0) es donde está el usuario al empezar[cite: 3]
+      optionalFeatures: opcionales,
+    };
+    if (overlay) opciones.domOverlay = { root: overlay };
+    return navigator.xr.requestSession("immersive-ar", opciones);
   };
-  if (overlay) {
-    opciones.domOverlay = { root: overlay };
+  try {
+    return await abrir(["local", "hit-test"], ["dom-overlay", "anchors"]);
+  } catch (error) {
+    if (error.name !== "NotSupportedError") throw error;
+    return abrir(["local"], ["dom-overlay", "hit-test", "anchors"]);
   }
-  return navigator.xr.requestSession("immersive-ar", opciones);
+}
+
+/**
+ * Pedir una función no garantiza recibirla. `enabledFeatures` lista las concedidas;
+ * si el navegador aún no la ofrece, se mira si existen las funciones de la API[cite: 3].
+ */
+export function capacidadesDe(sesion) {
+  const concedidas = sesion.enabledFeatures;
+  const tiene = (nombre, respaldo) => (Array.isArray(concedidas) ? concedidas.includes(nombre) : respaldo);
+  return {
+    overlay: Boolean(sesion.domOverlayState),
+    hitTest: tiene("hit-test", typeof sesion.requestHitTestSource === "function"),
+    anclas: tiene("anchors", typeof XRFrame !== "undefined" && "createAnchor" in XRFrame.prototype),
+  };
 }

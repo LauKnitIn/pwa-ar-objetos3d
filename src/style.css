@@ -297,14 +297,18 @@ code {
 
 #lienzo-3d {
   width: 100%;
-  height: 400px;
-  background-color: #0b1220;
+  height: 100%;
   display: block;
 }
 .visor {
   position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 400px; /* Respetamos tu altura inicial fija para que no salte de tamaño */
+  margin: 0 auto;
   background: #0b1220;
   overflow: hidden;
+  border-radius: 12px;
 }
 .fondo-camara {
   position: absolute;
@@ -315,16 +319,19 @@ code {
   z-index: 0;
 }
 .fondo-camara[hidden] {
-  display: none !important;
+  display: none;
 }
 .visor canvas {
-  position: relative;
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
   z-index: 1;
 }
-
-.xr-overlay { display: none; }
-
-.xr-overlay:xr-overlay { 
+.xr-overlay { 
+  display: none; 
+}
+.xr-overlay::xr-overlay { 
   display: flex; 
   flex-direction: column; 
   justify-content: flex-end; 
@@ -332,6 +339,8 @@ code {
   gap: .6em; 
   padding-bottom: 1.2em; 
   box-sizing: border-box; 
+  width: 100%;
+  height: 100%;
 }
 .xr-overlay p { 
   margin: 0; 

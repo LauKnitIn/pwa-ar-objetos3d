@@ -2,6 +2,10 @@ import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  base: '/pwa-ar-objetos3d/', 
+  resolve: {
+    dedupe: ['three'],
+  },
   plugins: [
     VitePWA({
       manifest: false, // El manifest ya lo tenemos creado a mano

@@ -18,7 +18,6 @@ import { descargarPendientes, ETIQUETA_SYNC } from '/src/descargas.js';
 
 import { diagnosticarAR, mensajeSoporteAR, pedirSesionAR } from "/src/xr.js";
 
-
 const listaEl = document.querySelector("#lista-catalogo");
 const lienzoEl = document.querySelector("#lienzo-3d");
 const btnOrientacion = document.querySelector("#btn-orientacion");
@@ -49,6 +48,74 @@ const MODELOS_IDS = ["modelo-demo-1", "modelo-demo-2", "modelo-demo-3"];
 
 //const controladorVisor = new ControladorVisor(listaEl,lienzoEl,descripcion);
 //controladorVisor.iniciar();
+
+// --- FUNCIONES DE ESTADO Y AYUDA AR ---
+const xrEstado = document.querySelector("#xr-estado");
+const xrDatos = document.querySelector("#xr-datos");
+
+let ultimoPintado = 0;
+let pendienteAR = null;
+let temporizadorAR = 0;
+
+function ayudaAR(e) {
+  if (!e.hitTest) return "Este dispositivo no ofrece hit-test: el cubo está a 1,5 m delante. Toca para traerlo delante de ti.";
+  switch (e.fase) {
+    case "buscando":
+      return e.sinSuperficie
+        ? "No encuentro superficies. Prueba con una zona con textura y buena luz, o toca la pantalla para colocar el cubo delante de ti."
+        : "Mueve el teléfono despacio hasta ver el anillo verde sobre una superficie.";
+    case "listo":
+      return "Toca la pantalla para colocar el cubo.";
+    case "colocado":
+      return e.overlay
+        ? "Arrastra para moverlo, gira con dos dedos, pellizca para el tamaño. Toca otro punto para recolocarlo."
+        : "Cubo colocado. Toca otro punto para recolocarlo.";
+  }
+}
+
+function pintarEstadoAR(e) {
+  if (!xrEstado || !xrDatos) return;
+  const si = (v) => (v ? "sí" : "no");
+  const { x, y, z } = e.posicion;
+  const pos = e.fase === "colocado" ? `(${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}) m` : "—";
+  const ayuda = ayudaAR(e);
+  const datos = `hit-test: ${si(e.hitTest)} · anclas: ${si(e.anclas)} · anclado: ${si(e.anclado)} · ` +
+    `fase: ${e.fase} · escala: ${e.escala.toFixed(2)} · giro: ${e.giroGrados}° · pos: ${pos} · ` +
+    `consultas: ${e.consultas} · resultados: ${e.resultados} · poses: ${e.impactos}`;
+  
+  if (xrEstado.textContent !== ayuda) xrEstado.textContent = ayuda;
+  if (xrDatos.textContent !== datos) xrDatos.textContent = datos;
+}
+
+function mostrarEstadoAR(e) {
+  if (performance.now() - ultimoPintado >= 200) {
+    ultimoPintado = performance.now();
+    pintarEstadoAR(e);
+    return;
+  }
+  pendienteAR = e;
+  if (temporizadorAR) return;
+  temporizadorAR = window.setTimeout(() => {
+    temporizadorAR = 0;
+    ultimoPintado = performance.now();
+    if (pendienteAR) pintarEstadoAR(pendienteAR);
+    pendienteAR = null;
+  }, 200);
+}
+
+// --- INICIALIZACIÓN DEL VISOR ---
+if (lienzoEl) {
+  visor = crearVisor("lienzo-3d", {
+    overlay: overlayAR,
+    alCambiar: (estado) => mostrarEstadoAR(estado),
+    alTerminar: () => {
+      if (xrEstado) xrEstado.textContent = "Sesión de realidad aumentada terminada.";
+      if (xrDatos) xrDatos.textContent = "";
+      if (btnAR) btnAR.disabled = false;
+      sesionAR = null;
+    }
+  });
+}
 
 const updateSW = registerSW({
   immediate: true,
